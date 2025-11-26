@@ -3,66 +3,59 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     padding: 20,
   },
 
-  card: {
-    backgroundColor: "white",
-    padding: 25,
-    borderRadius: 20,
-    elevation: 5,
+  form: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 16,
     shadowColor: "#000",
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 6,
+    elevation: 3,
   },
 
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#333",
-  },
-
-  input: {
-    backgroundColor: "#f8f8f8",
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-
-  textarea: {
-    height: 80,
+  errorText: {
+    color: "#ff3b30",
+    fontSize: 12.5,
+    marginTop: 4,
+    marginBottom: 8,
+    marginLeft: 4,
+    opacity: 0.85,
   },
 
   btnSalvar: {
-    backgroundColor: "#4b7bec",
-    padding: 14,
-    borderRadius: 10,
-    marginTop: 10,
+    backgroundColor: "#007AFF",
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 18,
+    shadowColor: "#007AFF",
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   btnText: {
-    color: "white",
+    color: "#fff",
     textAlign: "center",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "600",
   },
 
   btnSecundario: {
+    paddingVertical: 14,
+    borderRadius: 12,
     marginTop: 12,
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "#e6e9ef",
+    borderWidth: 1.5,
+    borderColor: "#C7C7CC",
   },
 
   btnSecundarioText: {
-    color: "#333",
+    color: "#007AFF",
     textAlign: "center",
-    fontSize: 15,
+    fontSize: 17,
+    fontWeight: "500",
   },
 });

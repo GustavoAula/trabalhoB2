@@ -1,92 +1,144 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useForm, Controller } from "react-hook-form";
+
 import styles from "./styles";
-import { FormData } from "../ListScreen";
+import Input from "../../components/Input";
+import { saveForm } from "../../storage/formStorage";
+import { useNavigation } from "@react-navigation/native";
 
-export default function FormScreen({ navigation }: any) {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [idade, setIdade] = useState("");
-  const [observacoes, setObservacoes] = useState("");
-  
+type FormData = {
+  nome: string;
+  email: string;
+  telefone: string;
+  idade: string;
+  observacoes: string;
+};
 
-  async function salvar() {
-    if (!nome || !email || !telefone || !idade) {
-      Alert.alert("Erro", "Preencha todos os campos obrigatórios!");
-      return;
+export default function FormScreen() {
+  const navigation = useNavigation<any>();
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      nome: "",
+      email: "",
+      telefone: "",
+      idade: "",
+      observacoes: "",
+    },
+  });
+
+  async function onSubmit(data: FormData) {
+    try {
+      await saveForm(data);
+      Alert.alert("Sucesso", "Formulário salvo com sucesso!");
+      reset();
+    } catch (error) {
+      console.error("Erro ao salvar formulário:", error);
+      Alert.alert("Erro", "Não foi possível salvar o formulário.");
     }
-    
-
-    const novo: FormData = {
-      nome,
-      email,
-      telefone,
-      idade,
-      observacoes,
-    };
-
-    const dados = await AsyncStorage.getItem("@formularios");
-    const lista = dados ? JSON.parse(dados) : [];
-
-    lista.push(novo);
-
-    await AsyncStorage.setItem("@formularios", JSON.stringify(lista));
-
-    Alert.alert("Sucesso", "Formulário salvo!");
-    setNome("");
-    setEmail("");
-    setTelefone("");
-    setIdade("");
-    setObservacoes("");
   }
 
   return (
-    <LinearGradient colors={["#eef2f7", "#d9e4f5"]} style={styles.container}>
-      
-      <View style={styles.card}>
-        <Text style={styles.title}>Cadastro de Formulário</Text>
+    <LinearGradient colors={["#6b6bff", "#3b3bff"]} style={styles.container}>
+      <View style={styles.form}>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Nome"
-          value={nome}
-          onChangeText={setNome}
+        <Controller
+          control={control}
+          name="nome"
+          rules={{ required: "Nome é obrigatório" }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="Nome"
+              value={value}
+              onChangeText={onChange}
+              placeholder="Digite o nome"
+            />
+          )}
+        />
+        {errors.nome && <Text style={styles.errorText}>{errors.nome.message}</Text>}
+
+        <Controller
+          control={control}
+          name="email"
+          rules={{
+            required: "E-mail é obrigatório",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "E-mail inválido",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="E-mail"
+              value={value}
+              onChangeText={onChange}
+              placeholder="exemplo@dominio.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          )}
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+
+        <Controller
+          control={control}
+          name="telefone"
+          rules={{
+            required: "Telefone é obrigatório",
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="Telefone"
+              value={value}
+              onChangeText={onChange}
+              placeholder="(xx) xxxxx-xxxx"
+              keyboardType="phone-pad"
+            />
+          )}
+        />
+        {errors.telefone && <Text style={styles.errorText}>{errors.telefone.message}</Text>}
+
+        <Controller
+          control={control}
+          name="idade"
+          rules={{
+            required: "Idade é obrigatória",
+            pattern: { value: /^[0-9]+$/, message: "Idade deve ser numérica" },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="Idade"
+              value={value}
+              onChangeText={onChange}
+              placeholder="Digite a idade"
+              keyboardType="numeric"
+            />
+          )}
+        />
+        {errors.idade && <Text style={styles.errorText}>{errors.idade.message}</Text>}
+
+        <Controller
+          control={control}
+          name="observacoes"
+          render={({ field: { onChange, value } }) => (
+            <Input
+              label="Observações"
+              value={value}
+              onChangeText={onChange}
+              placeholder="Observações (opcional)"
+              multiline
+            />
+          )}
         />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Telefone"
-          value={telefone}
-          onChangeText={setTelefone}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Idade"
-          keyboardType="numeric"
-          value={idade}
-          onChangeText={setIdade}
-        />
-
-        <TextInput
-          style={[styles.input, styles.textarea]}
-          placeholder="Observações (opcional)"
-          value={observacoes}
-          onChangeText={setObservacoes}
-          multiline
-        />
-
-        <TouchableOpacity style={styles.btnSalvar} onPress={salvar}>
+        <TouchableOpacity style={styles.btnSalvar} onPress={handleSubmit(onSubmit)}>
           <Text style={styles.btnText}>Salvar</Text>
         </TouchableOpacity>
 
@@ -97,7 +149,6 @@ export default function FormScreen({ navigation }: any) {
           <Text style={styles.btnSecundarioText}>Ver formulários</Text>
         </TouchableOpacity>
       </View>
-
     </LinearGradient>
   );
 }
